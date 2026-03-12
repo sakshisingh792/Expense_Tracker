@@ -1,0 +1,66 @@
+{% extends 'expenses/base.html' %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <h2 style="color: var(--text-main); margin-top: 0;">⚙️ Settings Hub</h2>
+    <p style="color: var(--text-muted); margin-bottom: 20px;">Manage your account preferences and view your financial history.</p>
+    
+    <a href="{% url 'history' %}" style="display: block; background: var(--bg-card); padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-decoration: none; color: var(--text-main); font-size: 1.2em; font-weight: bold; margin-bottom: 15px; border-left: 5px solid #3498db; transition: 0.3s;">
+        📊 View Spending History
+        <span style="float: right; color: var(--text-muted);">→</span>
+    </a>
+
+    <details style="background: var(--bg-card); padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; border-left: 5px solid #2ecc71;">
+        <summary style="font-size: 1.2em; font-weight: bold; color: var(--text-main); cursor: pointer; list-style: none;">
+            💵 Change Income & Currency
+            <span style="float: right; color: var(--text-muted);">▼</span>
+        </summary>
+        
+        <form method="POST" style="margin-top: 20px; border-top: 1px solid var(--border-std); padding-top: 20px;">
+            {% csrf_token %}
+            <div style="color: var(--text-muted);">
+                {{ form.as_p }}
+            </div>
+            <button type="submit" style="background-color: #27ae60; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; width: 100%; font-weight: bold; margin-top: 10px;">
+                Save Financial Settings
+            </button>
+        </form>
+    </details>
+
+    <details style="background: var(--bg-card); padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; border-left: 5px solid #9b59b6;">
+        <summary style="font-size: 1.2em; font-weight: bold; color: var(--text-main); cursor: pointer; list-style: none;">
+            🎯 Set Category Budgets
+            <span style="float: right; color: var(--text-muted);">▼</span>
+        </summary>
+        
+        <div style="margin-top: 20px; border-top: 1px solid var(--border-std); padding-top: 20px; max-height: 400px; overflow-y: auto;">
+            <p style="color: var(--text-muted); font-size: 0.9em; margin-top: 0; margin-bottom: 20px;">Set maximum monthly limits to track your spending progress on the dashboard.</p>
+            
+            {% for budget in budgets %}
+            <form method="POST" action="{% url 'update_budget' budget.id %}" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--bg-input); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border-std);">
+                {% csrf_token %}
+                <strong style="color: var(--text-main); flex: 1; font-size: 1em;">{{ budget.category.name }}</strong>
+                
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <span style="color: var(--text-muted); font-weight: bold;">{{ profile.currency }}</span>
+                    <input type="number" name="limit" value="{{ budget.limit|floatformat:0 }}" min="0" step="1" style="width: 80px; padding: 8px; border: 1px solid var(--border-std); border-radius: 6px; font-family: inherit; background: var(--bg-input); color: var(--text-main);">
+                    <button type="submit" style="background-color: #9b59b6; color: white; border: none; border-radius: 6px; padding: 8px 12px; cursor: pointer; font-weight: bold; transition: 0.2s;" onmouseover="this.style.backgroundColor='#8e44ad'" onmouseout="this.style.backgroundColor='#9b59b6'">
+                        Save
+                    </button>
+                </div>
+            </form>
+            {% empty %}
+            <div style="text-align: center; padding: 20px; border: 2px dashed var(--border-std); border-radius: 8px;">
+                <p style="color: var(--text-muted); font-size: 0.9em; margin: 0;">No categories yet.<br>Create an expense to auto-generate budgets!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </details>
+
+    <a href="{% url 'manage_categories' %}" style="display: block; background: var(--bg-card); padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-decoration: none; color: var(--text-main); font-size: 1.2em; font-weight: bold; margin-bottom: 15px; border-left: 5px solid #f39c12; transition: 0.3s;">
+        🏷️ Manage Custom Categories
+        <span style="float: right; color: var(--text-muted);">→</span>
+    </a>
+
+</div>
+{% endblock %}

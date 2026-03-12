@@ -1,0 +1,385 @@
+{% extends 'expenses/base.html' %}
+
+{% block content %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0;">📊 My Dashboard</h2>
+        <a href="{% url 'add_expense' %}" style="background-color: #3498db; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            + Add Expense
+        </a>
+    </div>
+
+    <div style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 20px 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3); margin-bottom: 30px; display: flex; align-items: center; gap: 15px;">
+        <div style="font-size: 2.5em; animation: float 3s ease-in-out infinite;">🤖</div>
+        <div>
+            <h4 style="margin: 0 0 5px 0; font-size: 1.1em; color: #a1c4fd; text-transform: uppercase; letter-spacing: 1px;">AI Financial Advisor</h4>
+            <p style="margin: 0; font-size: 1.1em; font-weight: 500; line-height: 1.5;">{{ insight_message|default:"Keep logging expenses to see insights!" }}</p>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+
+    {% if this_month_expenses >= budget_limit and budget_limit > 0 %}
+    <div style="background-color: #f8d7da; color: #721c24; padding: 15px 20px; border-radius: 8px; border-left: 5px solid #e74c3c; margin-bottom: 25px; font-weight: bold;">
+        ⚠️ Heads up! You have spent more than {{ budget_percentage }}% of your monthly salary.
+    </div>
+    {% endif %}
+
+    <h3 style="margin-bottom: 15px; color: #2c3e50;">💰 Savings Overview</h3>
+    <div style="display: flex; gap: 20px; margin-bottom: 40px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px; background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h4 style="margin: 0; font-size: 1em; color: #444; font-weight: 600;">Monthly Income</h4>
+                <a href="{% url 'settings' %}" style="font-size: 0.8em; color: #2980b9; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.5); padding: 4px 8px; border-radius: 4px;">
+                    ✏️ Edit
+                </a>
+            </div>
+            <h2 style="margin: 10px 0 0 0; font-size: 2.2em; color: #2c3e50;">{{ currency }}{{ monthly_salary|floatformat:2 }}</h2>
+        </div>
+
+        <div style="flex: 1; min-width: 200px; background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%); padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
+            <h4 style="margin: 0; font-size: 1em; color: #444; font-weight: 600;">Saved This Month</h4>
+            <h2 style="margin: 10px 0 0 0; font-size: 2.2em; color: {% if this_month_savings < 0 %}#c0392b{% else %}#27ae60{% endif %};">
+                {{ currency }}{{ this_month_savings|floatformat:2 }}
+            </h2>
+        </div>
+
+        <div style="flex: 1; min-width: 200px; background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
+            <h4 style="margin: 0; font-size: 1em; color: #444; font-weight: 600;">Saved This Year (YTD)</h4>
+            <h2 style="margin: 10px 0 0 0; font-size: 2.2em; color: {% if this_year_savings < 0 %}#c0392b{% else %}#8e44ad{% endif %};">
+                {{ currency }}{{ this_year_savings|floatformat:2 }}
+            </h2>
+        </div>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #2c3e50;">🎯 Monthly Category Budgets</h3>
+    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 40px;">
+        <p style="color: #7f8c8d; font-size: 0.9em; margin-top: 0; margin-bottom: 20px;">
+            Set your category limits in the admin panel to track your specific spending goals here.
+        </p>
+
+        {% for item in category_data %}
+            {% if item.limit > 0 %}
+            <div style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <strong style="color: #2c3e50; font-size: 1.1em;">{{ item.category }}</strong>
+                    <span style="font-weight: bold; color: {% if item.warning %}#c0392b{% else %}#27ae60{% endif %};">
+                        {{ currency }}{{ item.total|floatformat:2 }} / {{ currency }}{{ item.limit|floatformat:2 }}
+                    </span>
+                </div>
+                
+                <div style="width: 100%; background-color: #ecf0f1; border-radius: 10px; height: 12px; overflow: hidden;">
+                    <div style="height: 100%; width: {{ item.percent|floatformat:0 }}%; background-color: {% if item.warning %}#e74c3c{% else %}#2ecc71{% endif %}; transition: width 0.5s ease-in-out;"></div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #2c3e50;">🏆 Savings Goals</h3>
+    <div style="display: flex; gap: 20px; margin-bottom: 40px; flex-wrap: wrap;">
+        
+        {% for goal in goals %}
+        <div style="flex: 1; min-width: 300px; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee;">
+            
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; align-items: flex-end;">
+                <strong style="color: #2c3e50; font-size: 1.3em;">
+                    {{ goal.name }}
+                    <a href="{% url 'delete_goal' goal.id %}" style="text-decoration: none; font-size: 0.8em; margin-left: 8px; opacity: 0.6; transition: 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" title="Delete Goal">
+                        🗑️
+                    </a>
+                </strong>
+                <span style="font-weight: bold; color: #059669; font-size: 1.1em;">
+                    {{ currency }}{{ goal.current_amount|floatformat:0 }} <span style="color: #95a5a6; font-size: 0.8em;">/ {{ goal.target_amount|floatformat:0 }}</span>
+                </span>
+            </div>
+            
+            <div style="width: 100%; background-color: #ecf0f1; border-radius: 10px; height: 16px; overflow: hidden; margin-top: 10px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
+                <div style="height: 100%; width: {{ goal.progress_percentage|floatformat:0 }}%; background: linear-gradient(135deg, #059669 0%, #34d399 100%); border-radius: 10px; transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+            </div>
+            
+            <p style="text-align: right; margin: 8px 0 0 0; font-size: 0.85em; color: #7f8c8d; font-weight: bold;">
+                {{ goal.progress_percentage|floatformat:0 }}% Complete
+            </p>
+
+            <div style="margin-top: 15px; border-top: 1px solid #f1f3f5; padding-top: 15px;">
+                <form method="POST" action="{% url 'add_to_goal' goal.id %}" style="display: flex; gap: 8px;">
+                    {% csrf_token %}
+                    <input type="number" name="amount" placeholder="Add amount..." required style="flex: 1; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-family: inherit; font-size: 0.9em;">
+                    <button type="submit" style="background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 8px 15px; font-weight: bold; cursor: pointer; transition: 0.2s;">
+                        Add
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div style="flex: 1; min-width: 300px; max-width: 350px; background: white; padding: 25px; border-radius: 12px; border: 2px dashed #cbd5e0; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+            <h4 style="margin: 0 0 15px 0; color: #485460; font-size: 1.1em;">✨ Create New Goal</h4>
+            
+            <form method="POST" action="{% url 'add_goal' %}" style="display: flex; flex-direction: column; gap: 10px;">
+                {% csrf_token %}
+                <input type="text" name="name" placeholder="e.g. Vacation Fund" required style="padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-family: inherit;">
+                
+                <input type="number" name="target_amount" placeholder="Target Amount" required style="padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-family: inherit;">
+                
+                <button type="submit" style="background-color: #059669; color: white; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;">
+                    + Add Goal
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: #2c3e50;">📉 All-Time Spending</h3>
+    <div style="display: flex; gap: 20px; margin-bottom: 40px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
+            <h4 style="margin: 0; font-size: 1em; color: #444; font-weight: 600;">Total All-Time Expenses</h4>
+            <h2 style="margin: 10px 0 0 0; font-size: 2.2em; color: #c0392b;">{{ currency }}{{ total_expenses|floatformat:2 }}</h2>
+        </div>
+
+        <div style="flex: 1; min-width: 200px; background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
+            <h4 style="margin: 0; font-size: 1em; color: #444; font-weight: 600;">Total Transactions</h4>
+            <h2 style="margin: 10px 0 0 0; font-size: 2.2em; color: #2980b9;">{{ total_transaction_count }}</h2>
+        </div>
+    </div>
+
+    <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 40px;">
+        
+        <h3 style="margin-top: 0; margin-bottom: 10px; color: #2c3e50;">Recent Transactions</h3>
+        
+        {% if not search_query and total_transaction_count > 10 %}
+            <p style="color: #7f8c8d; font-size: 0.9em; margin-top: 0; margin-bottom: 20px;">
+                Showing the 10 most recent transactions. Use the search bar to find older records.
+            </p>
+        {% endif %}
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+            <form method="GET" action="{% url 'dashboard' %}" style="display: flex; gap: 10px; flex: 1; min-width: 250px;">
+                <input type="text" name="q" value="{{ search_query }}" placeholder="Search by description or category..." style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 1em;">
+                <button type="submit" style="background-color: #2c3e50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                    Search
+                </button>
+                {% if search_query %}
+                    <a href="{% url 'dashboard' %}" style="background-color: #e74c3c; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: flex; align-items: center;">
+                        Clear
+                    </a>
+                {% endif %}
+            </form>
+            <form method="GET" style="display: flex; gap: 10px; align-items: center; background: #f8f9fa; padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                
+                <input type="hidden" name="q" value="{{ search_query }}">
+                
+                <span style="color: #475569; font-weight: bold; font-size: 0.9em;">📥 Export:</span>
+                
+                <select name="timeframe" style="padding: 8px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 0.9em; outline: none;">
+                    <option value="month">This Month</option>
+                    <option value="day">Today</option>
+                    <option value="year">This Year</option>
+                    <option value="all">All-Time</option>
+                </select>
+                
+                <button type="submit" formaction="{% url 'export_csv' %}" style="background-color: #27ae60; color: white; padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9em; transition: 0.2s;" onmouseover="this.style.backgroundColor='#2ecc71'" onmouseout="this.style.backgroundColor='#27ae60'">
+                    CSV
+                </button>
+                
+                <button type="submit" formaction="{% url 'export_pdf' %}" style="background-color: #e74c3c; color: white; padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9em; transition: 0.2s;" onmouseover="this.style.backgroundColor='#ff7675'" onmouseout="this.style.backgroundColor='#e74c3c'">
+                    PDF
+                </button>
+            </form>
+           
+        </div>
+
+        <div style="overflow-x: auto; background: white; border-radius: 8px; border: 1px solid #eee;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background-color: #f8f9fa;">
+                        <th style="padding: 12px 15px; border-bottom: 2px solid #ddd;">Date</th>
+                        <th style="padding: 12px 15px; border-bottom: 2px solid #ddd;">Category</th>
+                        <th style="padding: 12px 15px; border-bottom: 2px solid #ddd;">Description</th>
+                        <th style="padding: 12px 15px; border-bottom: 2px solid #ddd;">Amount</th>
+                        <th style="padding: 12px 15px; border-bottom: 2px solid #ddd;">Actions</th>
+                        <th style="padding: 12px; text-align: center;">Receipt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                        <tr>
+                            <td style="padding: 12px 15px; border-bottom: 1px solid #eee;">{{ expense.date }}</td>
+                            <td style="padding: 12px 15px; border-bottom: 1px solid #eee;"><strong>{{ expense.category.name|default:expense.category }}</strong></td>
+                            <td style="padding: 12px 15px; border-bottom: 1px solid #eee; color: #555;">{{ expense.description }}</td>
+                            <td style="padding: 12px 15px; border-bottom: 1px solid #eee; color: #e74c3c; font-weight: bold;">
+                                -{{ currency }}{{ expense.amount }}
+                            </td>
+                            <td style="padding: 12px 15px; border-bottom: 1px solid #eee;">
+                                <a href="{% url 'edit_expense' expense.id %}" style="text-decoration: none; margin-right: 10px;" title="Edit">✏️</a>
+                                <a href="{% url 'delete_expense' expense.id %}" style="text-decoration: none;" title="Delete">🗑️</a>
+                            </td>
+                            <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">
+                                {% if expense.receipt %}
+                                    <a href="{{ expense.receipt.url }}" target="_blank">
+                                        <img src="{{ expense.receipt.url }}" alt="Receipt" style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px; border: 1px solid #ccc;">
+                                    </a>
+                                {% else %}
+                                    <span style="color: #bdc3c7; font-size: 0.9em;">No file</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" style="padding: 30px; text-align: center; color: #777;">
+                                No expenses yet. Click "+ Add Expense" to start tracking!
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 20px; margin-bottom: 40px; flex-wrap: wrap; align-items: stretch;">
+        
+        <div style="flex: 2; min-width: 400px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            <h3 style="text-align: left; margin-top: 0; margin-bottom: 20px; color: #2c3e50;">6-Month Spending Trend</h3>
+            <div style="position: relative; height: 300px; width: 100%;">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <div style="flex: 1; min-width: 300px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            <h3 style="text-align: center; margin-top: 0; margin-bottom: 20px; color: #2c3e50;">Spending by Category</h3>
+            <div style="position: relative; height: 300px; width: 100%;">
+                <canvas id="expenseChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <button id="chat-toggle-btn" style="position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; border-radius: 50%; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; border: 2px solid #334155; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6); cursor: pointer; font-size: 28px; z-index: 1000; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 6px 25px rgba(59, 130, 246, 0.5)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 6px 20px rgba(0, 0, 0, 0.6)';">
+        🤖
+    </button>
+
+    <div id="chat-window" style="position: fixed; bottom: 110px; right: 30px; width: 360px; height: 550px; background: #0f172a; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); display: none; flex-direction: column; z-index: 1000; overflow: hidden; border: 1px solid #334155;">
+        
+        <div style="background: #020617; color: #f8fafc; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.5em;">✨</span>
+                <h3 style="margin: 0; font-size: 1.1em; font-weight: 600; letter-spacing: 0.5px;">Your Expense Assistant
+
+                </h3>
+            </div>
+            <button id="close-chat-btn" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1.5em; transition: 0.2s;" onmouseover="this.style.color='#f8fafc'" onmouseout="this.style.color='#94a3b8'">
+                &times;
+            </button>
+        </div>
+        
+        <div id="chat-history" style="flex: 1; padding: 20px; overflow-y: auto; background: #0f172a; display: flex; flex-direction: column; gap: 15px;">
+            <div style="background: #1e293b; padding: 12px 18px; border-radius: 18px 18px 18px 4px; align-self: flex-start; max-width: 85%; color: #e2e8f0; font-size: 0.95em; border: 1px solid #334155; line-height: 1.5; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                Hello! I'm reading your latest expenses. Ask me anything about your spending!
+            </div>
+        </div>
+
+        <div style="padding: 15px 20px; background: #020617; border-top: 1px solid #1e293b; display: flex; gap: 10px; align-items: center;">
+            <input type="text" id="chat-input" placeholder="Message Expense..." style="flex: 1; padding: 12px 18px; border: 1px solid #334155; border-radius: 25px; font-family: inherit; outline: none; font-size: 0.95em; background: #1e293b; color: #f8fafc; transition: border-color 0.2s;" onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#334155'">
+            
+            <button id="send-chat-btn" style="background-color: #3b82f6; color: white; border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 8px rgba(59,130,246,0.4);" onmouseover="this.style.backgroundColor='#2563eb'; this.style.transform='scale(1.05)';" onmouseout="this.style.backgroundColor='#3b82f6'; this.style.transform='scale(1)';">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    
+    <script>
+        // --- EXISTING CHART LOGIC ---
+        Chart.register(ChartDataLabels);
+
+        const chartLabels = {{ labels|safe }};
+        const chartData = {{ totals|safe }};
+        if (chartData.length > 0) {
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            new Chart(ctx, { type: 'doughnut', data: { labels: chartLabels, datasets: [{ data: chartData, backgroundColor: ['#059669', '#3498db', '#f1c40f', '#e74c3c', '#9b59b6', '#34495e'], borderWidth: 2, borderColor: '#ffffff' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { padding: 20 } } } } });
+        } else {
+            document.getElementById('expenseChart').outerHTML = "<p style='color: #777; margin-top: 130px; text-align: center;'>Add some expenses to see your chart!</p>";
+        }
+
+        const lineLabels = {{ line_labels|safe }};
+        const lineData = {{ line_data|safe }};
+        if (lineData.some(val => val > 0)) {
+            const ctxLine = document.getElementById('trendChart').getContext('2d');
+            new Chart(ctxLine, { type: 'line', data: { labels: lineLabels, datasets: [{ label: 'Total Spent', data: lineData, borderColor: '#059669', backgroundColor: 'rgba(5, 150, 105, 0.1)', borderWidth: 3, pointBackgroundColor: '#ffffff', pointBorderColor: '#059669', pointBorderWidth: 2, pointRadius: 5, fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { borderDash: [5, 5], color: '#e2e8f0' } }, x: { grid: { display: false } } } } });
+        } else {
+            document.getElementById('trendChart').outerHTML = "<p style='color: #777; margin-top: 130px; text-align: center;'>No spending data for the last 6 months.</p>";
+        }
+
+        // --- NEW FLOATING CHAT LOGIC (DARK THEME) ---
+        const chatWindow = document.getElementById('chat-window');
+        const chatToggleBtn = document.getElementById('chat-toggle-btn');
+        const closeChatBtn = document.getElementById('close-chat-btn');
+        const inputField = document.getElementById('chat-input');
+        const chatHistory = document.getElementById('chat-history');
+
+        chatToggleBtn.addEventListener('click', () => {
+            chatWindow.style.display = 'flex';
+            chatToggleBtn.style.display = 'none';
+            inputField.focus(); 
+        });
+
+        closeChatBtn.addEventListener('click', () => {
+            chatWindow.style.display = 'none';
+            chatToggleBtn.style.display = 'flex';
+        });
+
+        document.getElementById('send-chat-btn').addEventListener('click', async function() {
+            const message = inputField.value.trim();
+            if (!message) return;
+
+            // User Bubble (Vibrant Blue)
+            chatHistory.innerHTML += `<div style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; padding: 12px 18px; border-radius: 18px 18px 4px 18px; align-self: flex-end; max-width: 85%; font-size: 0.95em; box-shadow: 0 2px 8px rgba(59,130,246,0.3); line-height: 1.5; border: 1px solid #60a5fa;">${message}</div>`;
+            inputField.value = '';
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            // Thinking Bubble (Dark Gray)
+            const typingId = "typing-" + Date.now();
+            chatHistory.innerHTML += `<div id="${typingId}" style="background: #1e293b; padding: 12px 18px; border-radius: 18px 18px 18px 4px; align-self: flex-start; max-width: 85%; color: #94a3b8; font-size: 0.9em; font-style: italic; border: 1px solid #334155; display: flex; gap: 5px; align-items: center;"><span style="animation: blink 1.4s infinite both;">.</span><span style="animation: blink 1.4s infinite both; animation-delay: 0.2s;">.</span><span style="animation: blink 1.4s infinite both; animation-delay: 0.4s;">.</span></div>`;
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            try {
+                const response = await fetch('{% url "ai_chat" %}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await response.json();
+                document.getElementById(typingId).remove();
+
+                if (data.success) {
+                    const formattedReply = data.reply.replace(/\*\*(.*?)\*\*/g, '<strong style="color: #60a5fa;">$1</strong>');
+                    // AI Reply Bubble (Dark Gray with slightly lighter text)
+                    chatHistory.innerHTML += `<div style="background: #1e293b; padding: 12px 18px; border-radius: 18px 18px 18px 4px; align-self: flex-start; max-width: 85%; color: #e2e8f0; font-size: 0.95em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); border: 1px solid #334155; line-height: 1.5;">${formattedReply}</div>`;
+                } else {
+                    chatHistory.innerHTML += `<div style="color: #ef4444; align-self: flex-start; font-size: 0.9em; padding: 0 10px;">Error: ${data.error}</div>`;
+                }
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            } catch (err) {
+                document.getElementById(typingId).remove();
+                chatHistory.innerHTML += `<div style="color: #ef4444; align-self: flex-start; font-size: 0.9em; padding: 0 10px;">Connection failed. Check your internet.</div>`;
+            }
+        });
+
+        inputField.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') { document.getElementById('send-chat-btn').click(); }
+        });
+    </script>
+    <style>
+        @keyframes blink { 0% { opacity: 0.2; } 20% { opacity: 1; } 100% { opacity: 0.2; } }
+        /* To make placeholder text visible on dark backgrounds */
+        #chat-input::placeholder { color: #64748b; }
+    </style>
+{% endblock %}

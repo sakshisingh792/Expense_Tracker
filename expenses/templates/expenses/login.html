@@ -1,0 +1,155 @@
+{% extends 'expenses/base.html' %}
+
+{% block content %}
+<style>
+
+    /* --- NEW: Make Django Errors Bright Red --- */
+    ul.errorlist {
+        color: #d63031 !important; /* Bright Red Text */
+        background-color: #ffeeee; /* Soft red background */
+        border-left: 4px solid #d63031; /* Sharp red border on the left */
+        padding: 10px 10px 10px 30px;
+        margin-top: 0;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-align: left;
+    }
+    
+    ul.errorlist li {
+        margin-bottom: 5px;
+    }
+    /* 1. The Full-Screen Container */
+    .auth-wrapper {
+        min-height: calc(100vh - 150px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%);
+        padding: 40px 20px;
+    }
+
+    /* 2. The Floating White Card */
+    .auth-card {
+        background: white;
+        max-width: 400px;
+        width: 100%;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 15px 35px rgba(4, 120, 87, 0.1);
+        border: 1px solid #e5e7eb;
+        text-align: center;
+        animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 3. The Typography */
+    .auth-title {
+        color: #1e272e;
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+    .auth-subtitle {
+        color: #6b7280;
+        font-size: 0.95rem;
+        margin-bottom: 30px;
+    }
+
+    /* 4. Magic CSS to target Django's automatic form inputs */
+    .auth-card form p {
+        text-align: left; /* Aligns the labels to the left */
+        margin-bottom: 20px;
+        color: #374151;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    .auth-card form input[type="text"],
+    .auth-card form input[type="password"],
+    .auth-card form input[type="email"] {
+        width: 100%;
+        padding: 14px;
+        margin-top: 8px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-family: inherit;
+        font-size: 1rem;
+        transition: all 0.3s;
+        background-color: #f9fafb;
+    }
+    
+    /* The glowing green border when you click an input! */
+    .auth-card form input:focus {
+        border-color: #059669;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+        background-color: #ffffff;
+    }
+
+    /* 5. The Emerald Button */
+    .btn-auth {
+        background-color: #059669;
+        color: white;
+        border: none;
+        padding: 15px;
+        width: 100%;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 10px;
+        box-shadow: 0 4px 10px rgba(5, 150, 105, 0.2);
+    }
+    .btn-auth:hover {
+        background-color: #047857;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(5, 150, 105, 0.3);
+    }
+
+    /* 6. The Footer Link */
+    .auth-footer {
+        margin-top: 25px;
+        font-size: 0.9rem;
+        color: #6b7280;
+    }
+    .auth-footer a {
+        color: #059669;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        
+        <div style="background-color: #f59e0b; color: white; padding: 5px 15px; border-radius: 8px; font-size: 1.2rem; font-weight: 900; display: inline-block; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);">
+            ET
+        </div>
+
+        <h2 class="auth-title">Welcome back</h2>
+        <p class="auth-subtitle">Log in to manage your financial portfolio.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            {{ form.as_p }}
+            
+            <button type="submit" class="btn-auth">Access Dashboard</button>
+        </form>
+
+        <div class="auth-footer">
+            Don't have an account yet? <a href="{% url 'register' %}">Sign up free</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

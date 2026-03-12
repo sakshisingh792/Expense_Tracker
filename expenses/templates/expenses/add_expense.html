@@ -1,0 +1,254 @@
+{% extends 'expenses/base.html' %}
+
+{% block content %}
+<div class="theme-card">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid var(--border-std); padding-bottom: 15px;">
+        <h2 class="theme-header">➕ Add New Expense</h2>
+        <a href="{% url 'dashboard' %}" class="cancel-link">✕ Cancel</a>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" id="expense-form" style="display: flex; flex-direction: column; gap: 20px;">
+        {% csrf_token %}
+        
+        <div style="font-family: inherit; font-size: 1em;">
+            {{ form.as_p }}
+        </div>
+        
+        <button type="submit" style="background-color: #3b82f6; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: 0.2s; margin-top: 10px; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);" onmouseover="this.style.backgroundColor='#2563eb'" onmouseout="this.style.backgroundColor='#3b82f6'">
+            Save Expense
+        </button>
+    </form>
+</div>
+
+<script>
+    // --- 1. RECEIPT SCANNER LOGIC ---
+    const receiptInput = document.getElementById('id_receipt'); 
+    const amountInput = document.getElementById('id_amount');
+
+    if (receiptInput && amountInput) {
+        receiptInput.addEventListener('change', function() {
+            const file = this.files[0];
+            
+            if (file) {
+                amountInput.placeholder = "🤖 AI Scanning receipt...";
+                amountInput.value = ""; 
+                amountInput.style.borderColor = "#8e44ad";
+
+                const formData = new FormData();
+                formData.append('receipt', file);
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                fetch('{% url "scan_receipt" %}', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        amountInput.value = data.amount;
+                        amountInput.style.borderColor = "#10b981"; // Green glow on success
+                    } else {
+                        amountInput.placeholder = "Couldn't read amount. Please type manually.";
+                        amountInput.style.borderColor = "#ef4444"; // Red glow on fail
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    amountInput.placeholder = "Amount";
+                    amountInput.style.borderColor = "var(--border-std)";
+                });
+            }
+        });
+    }
+
+    // --- 2. AI AUTO-CATEGORIZE LOGIC ---
+    document.addEventListener('DOMContentLoaded', function() {
+        const descInput = document.getElementById('id_description');
+        const catSelect = document.getElementById('id_category');
+        
+        if (descInput && catSelect) {
+            const magicBtn = document.createElement('button');
+            magicBtn.innerHTML = '✨ Auto-Categorize';
+            magicBtn.type = 'button'; 
+            magicBtn.style.cssText = 'margin-top: 5px; margin-bottom: 15px; display: block; background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85em; box-shadow: 0 4px 10px rgba(142, 68, 173, 0.3); transition: 0.2s; width: fit-content;';
+            
+            descInput.parentNode.insertBefore(magicBtn, descInput.nextSibling);
+            
+            magicBtn.addEventListener('click', async function() {
+                const desc = descInput.value.trim();
+                
+                if (!desc) {
+                    alert("Please type a description first! (e.g. 'Starbucks' or 'Netflix')");
+                    return;
+                }
+                
+                const originalText = magicBtn.innerHTML;
+                magicBtn.innerHTML = '⏳ Thinking...';
+                magicBtn.style.opacity = '0.7';
+                
+                try {
+                    const response = await fetch('{% url "predict_category" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        },
+                        body: JSON.stringify({ description: desc })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        let foundMatch = false;
+                        for (let i = 0; i < catSelect.options.length; i++) {
+                            let optionText = catSelect.options[i].text.toLowerCase();
+                            let aiText = data.category.toLowerCase().replace(/[^a-z0-9\s]/gi, '').trim(); 
+                            
+                            if (optionText.includes(aiText) || aiText.includes(optionText)) {
+                                catSelect.selectedIndex = i; 
+                                foundMatch = true;
+                                break;
+                            }
+                        }
+                        
+                        if (foundMatch) {
+                            magicBtn.innerHTML = '✅ Selected: ' + data.category;
+                            magicBtn.style.background = '#10b981'; // Green
+                        } else {
+                            magicBtn.innerHTML = '🤔 AI Guessed: [' + data.category + ']';
+                            magicBtn.style.background = '#f59e0b'; // Orange
+                        }
+                    } else {
+                        magicBtn.innerHTML = '❌ Error reading AI';
+                    }
+                } catch (e) {
+                    magicBtn.innerHTML = '❌ Connection Error';
+                }
+                
+                setTimeout(() => {
+                    magicBtn.innerHTML = originalText;
+                    magicBtn.style.background = 'linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%)';
+                    magicBtn.style.opacity = '1';
+                }, 3000);
+            });
+        }
+    });
+</script>
+
+<style>
+    /* 1. LIGHT MODE (Default) */
+    :root {
+        --bg-card: #ffffff;
+        --bg-input: #ffffff;
+        --text-main: #2c3e50;
+        --text-label: #7f8c8d;
+        --border-std: #cbd5e0;
+        --border-focus: #3498db;
+        --shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    /* 2. DARK MODE (Gemini Theme) - Activates automatically based on user's system! */
+   
+/* 2. DARK MODE (Gemini Theme) */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --bg-card: #1e1f20;       /* Lighter dark for the card */
+            --bg-input: #131314;      /* Deep dark for the inputs */
+            --text-main: #e3e3e3;     /* Crisp white text */
+            --text-label: #c4c7c5;    /* Light gray labels */
+            --border-std: #444746;    /* Subtle dark border */
+            --border-focus: #8ab4f8;  /* Light blue glow */
+            --shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        /* 1. Force the main body to be deep dark */
+        body, html {
+            background-color: #131314 !important; 
+            color: var(--text-main) !important;
+        }
+
+        /* 2. THE AGGRESSIVE OVERRIDE: 
+           This finds ANY container from your base.html that has a white background 
+           and brutally forces it to turn dark so it blends in perfectly. */
+        div[style*="background: white"], 
+        div[style*="background-color: white"],
+        div[style*="background-color: #ffffff"],
+        .container, main, .content-wrapper {
+            background-color: #131314 !important;
+            color: var(--text-main) !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        /* 3. Make sure the "Go Back" link is visible */
+        a {
+            color: #8ab4f8 !important;
+        }
+    }
+    /* 3. APPLY VARIABLES TO UI */
+    .theme-card {
+        max-width: 600px; 
+        margin: 20px auto 0; 
+        background-color: var(--bg-card); 
+        padding: 40px; 
+        border-radius: 12px; 
+        box-shadow: var(--shadow); 
+        border: 1px solid var(--border-std);
+    }
+
+    .theme-header {
+        margin: 0; 
+        color: var(--text-main);
+    }
+
+    .cancel-link {
+        text-decoration: none; 
+        color: var(--text-label); 
+        font-weight: bold; 
+        font-size: 0.9em; 
+        transition: 0.2s;
+    }
+
+    .cancel-link:hover {
+        color: #ef4444;
+    }
+
+    /* Form Inputs */
+    #expense-form input, 
+    #expense-form select, 
+    #expense-form textarea {
+        width: 100%;
+        padding: 12px;
+        background-color: var(--bg-input) !important;
+        color: var(--text-main) !important;
+        border: 1px solid var(--border-std) !important;
+        border-radius: 8px;
+        margin-top: 8px;
+        box-sizing: border-box; 
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    
+    #expense-form select option {
+        background-color: var(--bg-input);
+        color: var(--text-main);
+    }
+
+    #expense-form input:focus, 
+    #expense-form select:focus, 
+    #expense-form textarea:focus {
+        border-color: var(--border-focus) !important;
+    }
+
+    #expense-form label {
+        font-weight: 600;
+        color: var(--text-label);
+        font-size: 0.95em;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>
+{% endblock %}

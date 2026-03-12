@@ -1,0 +1,24 @@
+{% extends 'expenses/base.html' %}
+
+{% block content %}
+    <div style="max-width: 500px; margin: auto; text-align: center; padding: 40px; border: 1px solid #ffcccc; border-radius: 10px; background-color: #fff5f5;">
+        <h2 style="color: #c0392b;">⚠️ Are you sure?</h2>
+        <p style="font-size: 1.1em; color: #555;">
+            You are about to permanently delete the following expense:
+        </p>
+        
+        <div style="margin: 20px 0; padding: 15px; background-color: white; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <strong>{{ expense.category }}</strong>: ${{ expense.amount }} <br>
+            <span style="color: #777; font-size: 0.9em;">{{ expense.description }} ({{ expense.date }})</span>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <a href="{% url 'dashboard' %}" style="display: inline-block; padding: 10px 20px; background-color: #bdc3c7; color: #333; text-decoration: none; border-radius: 5px; margin-right: 10px;">Cancel</a>
+            
+            <button type="submit" style="padding: 10px 20px; background-color: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em;">
+                Yes, Delete it
+            </button>
+        </form>
+    </div>
+{% endblock %}

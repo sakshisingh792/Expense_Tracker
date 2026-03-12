@@ -1,0 +1,81 @@
+{% extends 'expenses/base.html' %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2 style="margin: 0; color: var(--text-main);">👤 My Profile</h2>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 30px; align-items: flex-start;">
+    
+    <div style="flex: 1; min-width: 300px; background: var(--bg-card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; border: 1px solid var(--border-std);">
+        
+        <div style="margin-bottom: 20px;">
+            {% if request.user.userprofile.profile_picture %}
+                <img src="{{ request.user.userprofile.profile_picture.url }}" alt="Profile" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid #10b981; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            {% else %}
+                <div style="width: 150px; height: 150px; border-radius: 50%; background: var(--bg-input); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 4rem; margin: 0 auto; border: 4px solid var(--border-std);">👤</div>
+            {% endif %}
+        </div>
+        
+        <h2 style="color: var(--text-main); margin: 0 0 5px 0; font-size: 2em;">{{ user.username }}</h2>
+        <p style="color: var(--text-muted); margin-top: 0; margin-bottom: 25px;">Account Status: <span style="color: #10b981; font-weight: bold;">Active</span></p>
+        
+        <hr style="border: none; border-top: 1px solid var(--border-std); margin-bottom: 25px;">
+        
+        <div style="text-align: left; padding: 0 10px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                <strong style="color: var(--text-muted);">Monthly Salary:</strong>
+                <span style="color: var(--text-main); font-weight: bold; font-size: 1.1em;">{{ profile.currency }}{{ profile.monthly_salary }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                <strong style="color: var(--text-muted);">Default Currency:</strong>
+                <span style="background: var(--bg-input); color: var(--text-main); padding: 2px 10px; border-radius: 15px; font-weight: bold; border: 1px solid var(--border-std);">{{ profile.currency }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <strong style="color: var(--text-muted);">Budget Warning at:</strong>
+                <span style="color: #e74c3c; font-weight: bold;">{{ profile.budget_alert_percentage }}%</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="flex: 2; min-width: 300px;">
+        
+        <div style="background: var(--bg-card); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; border: 1px solid var(--border-std);">
+            <h3 style="margin-top: 0; color: var(--text-main);">📸 Change Profile Picture</h3>
+            
+            <form method="POST" action="{% url 'upload_profile_picture' %}" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 15px;">
+                {% csrf_token %}
+                <input type="file" name="profile_picture" accept="image/*" required style="padding: 10px; border: 1px solid var(--border-std); border-radius: 6px; background: var(--bg-input); color: var(--text-main);">
+                <button type="submit" style="background-color: #3498db; color: white; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;">
+                    Upload New Photo
+                </button>
+            </form>
+        </div>
+
+        <form method="POST" action="{% url 'profile' %}" enctype="multipart/form-data" style="background: var(--bg-card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border-std);">
+            <h3 style="margin-top: 0; color: var(--text-main); margin-bottom: 20px;">✏️ Edit Your Details</h3>
+            {% csrf_token %}
+            
+            <div style="background: var(--bg-input); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-std);">
+                <h4 style="margin-top: 0; color: #10b981; border-bottom: 2px solid #10b981; padding-bottom: 5px; display: inline-block;">Personal Info</h4>
+                <div style="color: var(--text-muted);">
+                    {{ u_form.as_p }}
+                </div>
+            </div>
+            
+            <div style="background: var(--bg-input); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-std);">
+                <h4 style="margin-top: 0; color: #3b82f6; border-bottom: 2px solid #3b82f6; padding-bottom: 5px; display: inline-block;">Financial Settings</h4>
+                <div style="color: var(--text-muted);">
+                    {{ p_form.as_p }}
+                </div>
+            </div>
+            
+            <button type="submit" style="background-color: #10b981; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1em; width: 100%; font-weight: bold; margin-top: 10px; transition: 0.2s;">
+                Save All Details
+            </button>
+        </form> 
+
+    </div>
+    
+</div>
+{% endblock %}
