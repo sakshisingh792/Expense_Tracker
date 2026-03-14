@@ -84,41 +84,55 @@
     /* ------------------------
        NEW ANIMATION EFFECTS 
        ------------------------ */
-    
-    /* 1. Scroll Reveal Classes */
-    .reveal {
-        opacity: 0;
-        transform: translateY(60px);
-        transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); 
-    }
-    .reveal.active {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    /* 2. Floating Effect for Icons */
-    @keyframes float {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-12px); }
-        100% { transform: translateY(0px); }
-    }
-    .floating-icon {
-        animation: float 3.5s ease-in-out infinite;
-        display: inline-block;
-    }
-
-    /* 3. Pulsing Glow for Main Buttons */
-    @keyframes pulseGlow {
-        0% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.5); }
-        70% { box-shadow: 0 0 0 20px rgba(5, 150, 105, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); }
-    }
-    .btn-pulse {
-        animation: pulseGlow 2s infinite;
-    }
+    .reveal { opacity: 0; transform: translateY(60px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+    .reveal.active { opacity: 1; transform: translateY(0); }
+    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
+    .floating-icon { animation: float 3.5s ease-in-out infinite; display: inline-block; }
+    @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.5); } 70% { box-shadow: 0 0 0 20px rgba(5, 150, 105, 0); } 100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); } }
+    .btn-pulse { animation: pulseGlow 2s infinite; }
     @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes floatUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* =======================================================
+       DARK MODE SYNC (Links specifically to your toggle button)
+       ======================================================= */
+    body.dark-mode .bg-mint { background-color: var(--bg-page) !important; }
+    body.dark-mode .bg-white { background-color: var(--bg-card) !important; }
+    body.dark-mode .bg-grey { background-color: var(--bg-page) !important; }
+
+    body.dark-mode .hero-title, body.dark-mode .section-title, 
+    body.dark-mode .feature-title, body.dark-mode .step-title, 
+    body.dark-mode .price { color: var(--text-main) !important; }
+
+    body.dark-mode .hero-subtitle, body.dark-mode .section-subtitle, 
+    body.dark-mode p { color: var(--text-muted) !important; }
+
+    body.dark-mode .feature-card, body.dark-mode .pricing-card { background: var(--bg-card) !important; border-color: var(--border-std) !important; }
+    
+    body.dark-mode .btn-outline { color: var(--text-main) !important; border-color: var(--text-main) !important; }
+    body.dark-mode .btn-outline:hover { background-color: var(--text-main) !important; color: var(--bg-page) !important; }
+    
+    body.dark-mode .mockup-window { background: var(--bg-card) !important; border-color: var(--border-std) !important; }
+    body.dark-mode .mockup-header { background: var(--bg-page) !important; border-color: var(--border-std) !important; }
+    body.dark-mode .mockup-body { background: var(--bg-page) !important; }
+    body.dark-mode .mockup-sidebar { background: var(--bg-card) !important; }
+    body.dark-mode .mockup-chart { background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-page) 100%) !important; border-color: var(--border-std) !important; }
+
+    body.dark-mode .pricing-list li { border-color: var(--border-std) !important; color: var(--text-muted) !important; }
+    body.dark-mode .btn-light { background: var(--border-std) !important; color: var(--text-main) !important; }
+
+    /* Fix Contact Form & About cards with hardcoded inline whites */
+    body.dark-mode div[style*="background: #ffffff"], 
+    body.dark-mode div[style*="background: white"] {
+        background: var(--bg-card) !important;
+        border-color: var(--border-std) !important;
+        color: var(--text-main) !important;
+    }
+    body.dark-mode div[style*="color: #1e272e"],
+    body.dark-mode div[style*="color: #2c3e50"] {
+        color: var(--text-main) !important;
+    }
 </style>
 
 <div class="section bg-mint">

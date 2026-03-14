@@ -2,12 +2,11 @@
 
 {% block content %}
 <style>
-
     /* --- NEW: Make Django Errors Bright Red --- */
     ul.errorlist {
-        color: #d63031 !important; /* Bright Red Text */
-        background-color: #ffeeee; /* Soft red background */
-        border-left: 4px solid #d63031; /* Sharp red border on the left */
+        color: #d63031 !important; 
+        background-color: #ffeeee; 
+        border-left: 4px solid #d63031; 
         padding: 10px 10px 10px 30px;
         margin-top: 0;
         margin-bottom: 20px;
@@ -20,25 +19,27 @@
     ul.errorlist li {
         margin-bottom: 5px;
     }
+
     /* 1. The Full-Screen Container */
     .auth-wrapper {
         min-height: calc(100vh - 150px);
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%);
+        /* Swapped hardcoded mint/white for variables */
+        background: linear-gradient(135deg, var(--bg-page) 0%, var(--bg-card) 100%);
         padding: 40px 20px;
     }
 
-    /* 2. The Floating White Card */
+    /* 2. The Floating Card */
     .auth-card {
-        background: white;
+        background: var(--bg-card); /* Now perfectly syncs with dark mode */
         max-width: 400px;
         width: 100%;
         padding: 40px;
         border-radius: 16px;
-        box-shadow: 0 15px 35px rgba(4, 120, 87, 0.1);
-        border: 1px solid #e5e7eb;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--border-std);
         text-align: center;
         animation: slideUp 0.6s ease-out;
     }
@@ -50,22 +51,22 @@
 
     /* 3. The Typography */
     .auth-title {
-        color: #1e272e;
+        color: var(--text-main);
         font-size: 1.8rem;
         font-weight: 800;
         margin-bottom: 10px;
     }
     .auth-subtitle {
-        color: #6b7280;
+        color: var(--text-muted);
         font-size: 0.95rem;
         margin-bottom: 30px;
     }
 
     /* 4. Magic CSS to target Django's automatic form inputs */
     .auth-card form p {
-        text-align: left; /* Aligns the labels to the left */
+        text-align: left; 
         margin-bottom: 20px;
-        color: #374151;
+        color: var(--text-main);
         font-weight: 600;
         font-size: 0.9rem;
     }
@@ -75,21 +76,22 @@
         width: 100%;
         padding: 14px;
         margin-top: 8px;
-        border: 1px solid #d1d5db;
+        border: 1px solid var(--border-std);
         border-radius: 8px;
         box-sizing: border-box;
         font-family: inherit;
         font-size: 1rem;
         transition: all 0.3s;
-        background-color: #f9fafb;
+        background-color: var(--bg-page);
+        color: var(--text-main);
     }
     
     /* The glowing green border when you click an input! */
     .auth-card form input:focus {
-        border-color: #059669;
+        border-color: #059669 !important;
         outline: none;
         box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
-        background-color: #ffffff;
+        background-color: var(--bg-card) !important;
     }
 
     /* 5. The Emerald Button */
@@ -117,7 +119,7 @@
     .auth-footer {
         margin-top: 25px;
         font-size: 0.9rem;
-        color: #6b7280;
+        color: var(--text-muted);
     }
     .auth-footer a {
         color: #059669;

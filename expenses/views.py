@@ -679,7 +679,7 @@ from django.contrib.auth.decorators import login_required
 
 # Initialize the new Client architecture
 # IMPORTANT: Put your actual API key back in here!
-client = genai.Client(api_key="AIzaSyB5Nv5KosLP1ITOQxgsFrjHxHQCWGp8rpc")
+client = genai.Client(api_key="AIzaSyBNuY1uq3sDzeiTLqXn-kd6CfB4Aw2GGpM")
 
 @csrf_exempt
 @login_required
@@ -721,6 +721,12 @@ def ai_chat(request):
     return JsonResponse({'success': False, 'error': 'Invalid request'})
 
 
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from .models import Category
+
 @csrf_exempt
 @login_required
 def predict_category(request):
@@ -745,7 +751,7 @@ def predict_category(request):
             Reply with EXACTLY and ONLY the category name. Do not add any punctuation, quotes, or extra words.
             """
 
-            # 2. Ask Gemini (Using a simplified config dictionary to prevent import crashes!)
+            # 2. Ask Gemini 
             response = client.models.generate_content(
                 model='gemini-2.5-flash',
                 contents=prompt,
@@ -755,16 +761,20 @@ def predict_category(request):
                 }
             )
             
-            predicted_category = response.text.strip()
-            
-            # Print the AI's thought process to your terminal!
-            print(f"✅ AI Successfully Predicted: {predicted_category}") 
-            
-            return JsonResponse({'success': True, 'category': predicted_category})
+            # --- THE SAFETY NET FIX ---
+            # Check if response exists AND if response.text actually has content
+            if response and response.text:
+                predicted_category = response.text.strip()
+                print(f"✅ AI Successfully Predicted: {predicted_category}") 
+                return JsonResponse({'success': True, 'category': predicted_category})
+            else:
+                # If the AI blocked it or returned nothing, catch it gracefully!
+                print("⚠️ AI ERROR: Response was empty. (Possible safety filter block or API stutter)")
+                return JsonResponse({'success': False, 'error': 'AI returned an empty response.'})
 
         except Exception as e:
-            # THIS IS THE MAGIC LINE: It will print the exact reason it failed to your VS Code terminal!
-            print(f"❌ AI ERROR: {str(e)}") 
+            # This catches any other major Python crashes
+            print(f"❌ AI CRASH: {str(e)}") 
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Invalid request'})

@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-vf&m=f1+()kztz&eb^47&@zu-&s-^oy6rxdfh5pyc&9!8zxned'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -121,3 +121,4 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # settings.py
 LOGOUT_REDIRECT_URL = '/'  # Sends users back to the landing page when they log out anywhere
+STATIC_ROOT = BASE_DIR / "staticfiles"
