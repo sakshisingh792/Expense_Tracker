@@ -27,7 +27,7 @@
     .btn-outline { background-color: transparent; color: #1e272e; padding: 15px 35px; font-size: 1.1rem; font-weight: bold; border: 2px solid #1e272e; border-radius: 30px; text-decoration: none; transition: 0.3s; }
     .btn-outline:hover { background-color: #1e272e; color: white; transform: translateY(-3px); }
 
-    /* --- PURE CSS BROWSER MOCKUP --- */
+    /* --- PURE CSS BROWSER MOCKUP --- 
     .mockup-window { max-width: 900px; margin: 0 auto; background: #ffffff; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid #e1e8ed; animation: floatUp 1.2s ease-out; }
     .mockup-header { background: #f1f3f5; padding: 12px 20px; display: flex; gap: 8px; border-bottom: 1px solid #e1e8ed; }
     .mockup-dot { width: 12px; height: 12px; border-radius: 50%; }
@@ -35,7 +35,71 @@
     .mockup-body { padding: 40px; display: flex; gap: 20px; background: #fafbfc; }
     .mockup-sidebar { flex: 1; background: #edf2f7; border-radius: 8px; height: 300px; }
     .mockup-chart {background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%); border-radius: 8px; border: 1px dashed #cbd5e0; height: 300px; display: flex; align-items: flex-end; justify-content: space-around; padding: 20px;  }
-    .bar {width: 40px; background: #059669; border-radius: 4px 4px 0 0;  }
+    .bar {width: 40px; background: #059669; border-radius: 4px 4px 0 0;  } --- */
+
+    /* --- PURE CSS BROWSER MOCKUP --- */
+.mockup-window { 
+    max-width: 900px; 
+    margin: 0 auto; 
+    background: #ffffff; 
+    border-radius: 12px; 
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
+    border: 1px solid #e1e8ed; 
+    animation: floatUp 1.2s ease-out; 
+    overflow: hidden; 
+}
+
+.mockup-header { 
+    background: #f1f3f5; 
+    padding: 12px 20px; 
+    display: flex; 
+    gap: 8px; 
+    border-bottom: 1px solid #e1e8ed; 
+}
+
+.mockup-dot { width: 12px; height: 12px; border-radius: 50%; }
+.dot-red { background-color: #ff5f56; }
+.dot-yellow { background-color: #ffbd2e; }
+.dot-green { background-color: #27c93f; }
+
+/* The container for your 2-3 images */
+.mockup-body { 
+    padding: 20px; 
+    display: flex; 
+    gap: 15px; 
+    background: #fafbfc; 
+    height: 450px; /* Adjusted height to fit images nicely */
+}
+
+/* Common style for your image containers */
+.mockup-img-wrapper {
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.mockup-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* This prevents the images from stretching */
+    display: block;
+}
+
+/* Specific Sidebar Style (The thin left image) */
+.img-sidebar { flex: 1; }
+
+/* Specific Main Content Style (The large right area) */
+.img-main-stack { 
+    flex: 3; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; 
+}
+
+.img-main-chart { flex: 2; }
+.img-sub-stats { flex: 1; }
 
     /* ------------------------
        2. FEATURES SECTION 
@@ -145,7 +209,7 @@
         <a href="{% url 'login' %}" class="btn-outline">LOGIN</a>
     </div>
 
-    <div class="mockup-window">
+    {% comment %} <div class="mockup-window">
         <div class="mockup-header">
             <div class="mockup-dot dot-red"></div>
             <div class="mockup-dot dot-yellow"></div>
@@ -159,6 +223,57 @@
                 <div class="bar" style="height: 30%; background: #e74c3c;"></div>
                 <div class="bar" style="height: 90%;"></div>
                 <div class="bar" style="height: 60%;"></div>
+            </div>
+        </div>
+    </div> {% endcomment %}
+
+    {% comment %} <div class="mockup-window">
+    <div class="mockup-header">
+        <div class="mockup-dot dot-red"></div>
+        <div class="mockup-dot dot-yellow"></div>
+        <div class="mockup-dot dot-green"></div>
+    </div>
+    <div class="mockup-body" style="display: flex; gap: 15px; padding: 15px; background: #f8fafc; height: 400px;">
+        
+        <div style="flex: 1; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden;">
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=300" 
+                 alt="Sidebar" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+
+        <div style="flex: 3; display: flex; flex-direction: column; gap: 15px;">
+            
+            <div style="flex: 2; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden;">
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800" 
+                     alt="Main Analytics" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+
+            <div style="flex: 1; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden;">
+                <img src="https://images.unsplash.com/photo-1543286386-713bdd548da4?auto=format&fit=crop&q=80&w=800" 
+                     alt="Expense Cards" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        </div>
+    </div>
+</div>
+</div> {% endcomment %}
+
+
+<div class="mockup-window">
+    <div class="mockup-header">
+        <div class="mockup-dot dot-red"></div>
+        <div class="mockup-dot dot-yellow"></div>
+        <div class="mockup-dot dot-green"></div>
+    </div>
+    <div class="mockup-body">
+        <div class="mockup-img-wrapper img-sidebar">
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=300" alt="Sidebar">
+        </div>
+
+        <div class="img-main-stack">
+            <div class="mockup-img-wrapper img-main-chart">
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800" alt="Main Chart">
+            </div>
+            <div class="mockup-img-wrapper img-sub-stats">
+                <img src="https://images.unsplash.com/photo-1543286386-713bdd548da4?q=80&w=800" alt="Stats">
             </div>
         </div>
     </div>
@@ -233,7 +348,7 @@
         <div style="flex: 1; min-width: 300px;">
             <h3 style="font-size: 1.8rem; color: #1e272e; margin-bottom: 15px;">Our Mission</h3>
             <p style="color: #485460; line-height: 1.8; font-size: 1.1rem; margin-bottom: 20px;">
-                ExpenseTracker started as a simple hackathon idea: what if managing money was actually effortless? We realized that most budgeting apps are cluttered with ads, confusing interfaces, or force you into rigid categories. 
+                ExpenseTracker started as a simple  idea: what if managing money was actually effortless? We realized that most budgeting apps are cluttered with ads, confusing interfaces, or force you into rigid categories. 
             </p>
             <p style="color: #485460; line-height: 1.8; font-size: 1.1rem;">
                 Our goal is to give students, freelancers, and professionals complete control over their financial data with an elegant, lightning-fast platform that prioritizes privacy and customizability.
@@ -256,7 +371,7 @@
             <div style="background: white; padding: 25px 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; width: 150px; border: 1px solid #eee; transform: translateY(30px); transition: transform 0.3s;">
                 <div style="font-size: 3.5rem; margin-bottom: 15px;">🚀</div>
                 <div style="font-weight: 800; color: #1e272e; font-size: 1.1rem;">The Vision</div>
-                <div style="font-size: 0.85rem; color: #3498db; font-weight: bold; margin-top: 5px;">UI/UX Design</div>
+                <div style="font-size: 0.85rem; color: #3498db; font-weight: bold; margin-top: 5px;">Sovereignty</div>
             </div>
         </div>
     </div>

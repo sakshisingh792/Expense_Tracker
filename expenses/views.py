@@ -679,7 +679,13 @@ from django.contrib.auth.decorators import login_required
 
 # Initialize the new Client architecture
 # IMPORTANT: Put your actual API key back in here!
-client = genai.Client(api_key="AIzaSyBNuY1uq3sDzeiTLqXn-kd6CfB4Aw2GGpM")
+import os
+from dotenv import load_dotenv
+from google import genai
+
+# Load the secret vault
+load_dotenv()
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 @csrf_exempt
 @login_required
@@ -699,7 +705,7 @@ def ai_chat(request):
 
             master_prompt = f"""
             You are a brilliant, friendly, and concise financial advisor for an expense tracking app.
-            Analyze the user's data provided below to answer their question. Keep your answer under 3-4 short sentences. 
+            Analyze the user's data provided below to answer their question. Keep your answer under 3-4 short sentences or in points if asked
             Be encouraging, but point out if they are spending too much on one specific thing. Do not use markdown formatting like asterisks.
             
             {expense_data_str}
