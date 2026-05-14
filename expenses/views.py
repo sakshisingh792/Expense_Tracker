@@ -562,7 +562,7 @@ def delete_goal(request, goal_id):
     goal.delete()
     return redirect('dashboard')
 
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+#pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 @csrf_exempt
 def scan_receipt(request):
     if request.method == 'POST' and request.FILES.get('receipt'):
