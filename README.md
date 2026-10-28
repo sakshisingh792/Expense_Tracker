@@ -2,6 +2,8 @@
 
 An advanced, full-stack personal finance application built with Django. FinAI goes beyond traditional expense tracking by integrating **Computer Vision (OCR)** for automated receipt scanning and **Large Language Models (Google Gemini 2.5)** to provide an interactive, RAG-based financial advisor and smart auto-categorization.
 
+Live link https://expense-tracker-1-e9ms.onrender.com
+
 ## ✨ Key Features
 
 * **🤖 Built-in AI Financial Advisor:** A floating, context-aware chatbot that reads your real-time database to answer questions about your spending habits, provide insights, and alert you to budget anomalies.
